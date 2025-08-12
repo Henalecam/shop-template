@@ -2,7 +2,9 @@ import { Router } from "express";
 import { prisma } from "../prisma.js";
 import { tenantResolver } from "../middlewares/tenantResolver.js";
 import { geoMessage } from "../middlewares/geoMessage.js";
-import { QRCodePix } from "qrcode-pix";
+import pkg from "qrcode-pix";
+
+const { QrCodePix } = pkg;
 
 const router = Router();
 
@@ -54,7 +56,7 @@ router.get("/payment/pix/:productId", tenantResolver, async (req, res, next) => 
     }
 
     const value = Number(product.price);
-    const pix = QRCodePix({
+    const pix = QrCodePix({
       version: "01",
       key: tenant.pix_key,
       name: tenant.name.substring(0, 25),
