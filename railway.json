@@ -23,6 +23,18 @@
         "PORT": "3000"
       },
       "startCommand": "npm start"
+    },
+    {
+      "name": "admin-frontend",
+      "rootDirectory": "base/admin-frontend",
+      "build": {
+        "builder": "NIXPACKS"
+      },
+      "envs": {
+        "PORT": "3001",
+        "NEXT_PUBLIC_API_URL": "${{ RAILWAY_PRIVATE_DOMAIN ? `https://$RAILWAY_PRIVATE_DOMAIN` : `https://<backend>.railway.app` }}/api"
+      },
+      "startCommand": "npm start"
     }
   ]
 }

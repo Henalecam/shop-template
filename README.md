@@ -17,9 +17,11 @@ base/
 - Variáveis de ambiente:
   - Backend: `DATABASE_URL` (PostgreSQL), `PRIMARY_DOMAIN` (opcional), `PORT` (4000)
   - Frontend: `PORT` (3000) e, se consumir a API, `NEXT_PUBLIC_API_URL`
+  - Admin: `PORT` (3001) e `NEXT_PUBLIC_API_URL` apontando para o backend
 - Build/Run:
   - Backend: usa Nixpacks, `postinstall` roda `prisma generate` e `prestart` roda `prisma migrate deploy`. Healthcheck: `/health`.
   - Frontend: `next build` e `next start -p $PORT` (via Procfile).
+  - Admin: `next build` e `next start -p $PORT` (via Procfile).
 
 ### Passos
 1) No Railway, crie um Postgres e copie o `DATABASE_URL`.
