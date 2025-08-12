@@ -1,0 +1,28 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "services": [
+    {
+      "name": "backend",
+      "rootDirectory": "base/backend",
+      "build": {
+        "builder": "NIXPACKS"
+      },
+      "envs": {
+        "PORT": "4000"
+      },
+      "startCommand": "npm start",
+      "healthcheckPath": "/health"
+    },
+    {
+      "name": "frontend",
+      "rootDirectory": "base/templates/frontend-template",
+      "build": {
+        "builder": "NIXPACKS"
+      },
+      "envs": {
+        "PORT": "3000"
+      },
+      "startCommand": "npm start"
+    }
+  ]
+}
