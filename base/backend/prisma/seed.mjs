@@ -3,12 +3,13 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  // Templates
+  // Templates (5)
   const templates = [
     { name: "Skate Shop", slug: "skate", preview_url: "/templates/skate?tenantId={tenantId}" },
     { name: "Sneakers Store", slug: "sneakers", preview_url: "/templates/sneakers?tenantId={tenantId}" },
     { name: "Street Wear", slug: "streetwear", preview_url: "/templates/streetwear?tenantId={tenantId}" },
     { name: "Minimal", slug: "minimal", preview_url: "/templates/minimal?tenantId={tenantId}" },
+    { name: "Electronics", slug: "electronics", preview_url: "/templates/electronics?tenantId={tenantId}" },
   ];
 
   const templateMap = {};
@@ -21,7 +22,7 @@ async function main() {
     templateMap[t.slug] = created.id;
   }
 
-  // Tenants
+  // Tenants (5)
   const skateTenant = await prisma.tenant.upsert({
     where: { name: "skate" },
     update: {},
@@ -34,20 +35,55 @@ async function main() {
     },
   });
 
-  const loja1 = await prisma.tenant.upsert({
-    where: { name: "loja1" },
+  const sneakersTenant = await prisma.tenant.upsert({
+    where: { name: "sneakers" },
     update: {},
     create: {
-      name: "loja1",
-      logo_url: null,
+      name: "sneakers",
+      primary_color: "#111827",
+      secondary_color: "#22d3ee",
+      pix_key: "sneakers@example.com",
+      template_id: templateMap["sneakers"],
+    },
+  });
+
+  const streetwearTenant = await prisma.tenant.upsert({
+    where: { name: "streetwear" },
+    update: {},
+    create: {
+      name: "streetwear",
+      primary_color: "#1f2937",
+      secondary_color: "#f59e0b",
+      pix_key: "streetwear@example.com",
+      template_id: templateMap["streetwear"],
+    },
+  });
+
+  const minimalTenant = await prisma.tenant.upsert({
+    where: { name: "minimal" },
+    update: {},
+    create: {
+      name: "minimal",
       primary_color: "#111827",
       secondary_color: "#6366f1",
-      pix_key: "chave-pix-de-teste@example.com",
+      pix_key: "minimal@example.com",
       template_id: templateMap["minimal"],
     },
   });
 
-  // Products per tenant (scoped)
+  const electronicsTenant = await prisma.tenant.upsert({
+    where: { name: "electronics" },
+    update: {},
+    create: {
+      name: "electronics",
+      primary_color: "#0f172a",
+      secondary_color: "#38bdf8",
+      pix_key: "electronics@example.com",
+      template_id: templateMap["electronics"],
+    },
+  });
+
+  // Products per tenant
   const productsByTenant = {
     [skateTenant.id]: [
       {
@@ -69,27 +105,84 @@ async function main() {
         image_url: "https://images.unsplash.com/photo-1536924940846-227afb31e2a5?q=80&w=1200&auto=format&fit=crop",
       },
     ],
-    [loja1.id]: [
+    [sneakersTenant.id]: [
+      {
+        name: "Tênis Runner X",
+        description: "Amortecimento responsivo",
+        price: "399.90",
+        image_url: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1200&auto=format&fit=crop",
+      },
+      {
+        name: "Tênis Street Pro",
+        description: "Solado vulcanizado",
+        price: "299.90",
+        image_url: "https://images.unsplash.com/photo-1520256862855-398228c41684?q=80&w=1200&auto=format&fit=crop",
+      },
+      {
+        name: "Meia Performance",
+        description: "Par com suporte no arco",
+        price: "39.90",
+        image_url: "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1200&auto=format&fit=crop",
+      },
+    ],
+    [streetwearTenant.id]: [
+      {
+        name: "Camiseta Oversized",
+        description: "Malha 230gsm",
+        price: "119.90",
+        image_url: "https://images.unsplash.com/photo-1520975922284-9d26d111fadd?q=80&w=1200&auto=format&fit=crop",
+      },
+      {
+        name: "Calça Cargo",
+        description: "Vários bolsos funcionais",
+        price: "199.90",
+        image_url: "https://images.unsplash.com/photo-1596755094514-f87e3e7fa8cf?q=80&w=1200&auto=format&fit=crop",
+      },
+      {
+        name: "Boné Trucker",
+        description: "Ajustável, tela traseira",
+        price: "79.90",
+        image_url: "https://images.unsplash.com/photo-1520976191273-8b3a1c1d7c3d?q=80&w=1200&auto=format&fit=crop",
+      },
+    ],
+    [minimalTenant.id]: [
       {
         name: "Camiseta Básica",
         description: "Camiseta 100% algodão",
         price: "49.90",
-        image_url:
-          "https://images.unsplash.com/photo-1520975922284-9d26d111fadd?q=80&w=1200&auto=format&fit=crop",
+        image_url: "https://images.unsplash.com/photo-1520975922284-9d26d111fadd?q=80&w=1200&auto=format&fit=crop",
       },
       {
         name: "Tênis Conforto",
         description: "Ideal para o dia a dia",
         price: "199.90",
-        image_url:
-          "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1200&auto=format&fit=crop",
+        image_url: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1200&auto=format&fit=crop",
       },
       {
         name: "Mochila Urbana",
         description: "Resistente e leve",
         price: "129.90",
-        image_url:
-          "https://images.unsplash.com/photo-1547949003-9792a18a2601?q=80&w=1200&auto=format&fit=crop",
+        image_url: "https://images.unsplash.com/photo-1547949003-9792a18a2601?q=80&w=1200&auto=format&fit=crop",
+      },
+    ],
+    [electronicsTenant.id]: [
+      {
+        name: "Smartphone ZX10",
+        description: "128GB, Câmera 50MP",
+        price: "2599.90",
+        image_url: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=1200&auto=format&fit=crop",
+      },
+      {
+        name: "Fone Bluetooth ANC",
+        description: "Cancelamento ativo de ruído",
+        price: "699.90",
+        image_url: "https://images.unsplash.com/photo-1518443892832-96f1c7a83367?q=80&w=1200&auto=format&fit=crop",
+      },
+      {
+        name: "Notebook Slim 14",
+        description: "i5, 16GB, SSD 512GB",
+        price: "4599.90",
+        image_url: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=1200&auto=format&fit=crop",
       },
     ],
   };
@@ -104,7 +197,13 @@ async function main() {
     }
   }
 
-  console.log("Seed completed for tenants:", { skate: skateTenant.name, loja1: loja1.name });
+  console.log("Seed completed for tenants:", {
+    skate: skateTenant.name,
+    sneakers: sneakersTenant.name,
+    streetwear: streetwearTenant.name,
+    minimal: minimalTenant.name,
+    electronics: electronicsTenant.name,
+  });
 }
 
 main()
