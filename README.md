@@ -19,7 +19,7 @@ base/
   - Frontend: `PORT` (3000) e, se consumir a API, `NEXT_PUBLIC_API_URL`
   - Admin: `PORT` (3001) e `NEXT_PUBLIC_API_URL` apontando para o backend
 - Build/Run:
-  - Backend: usa Nixpacks, `postinstall` roda `prisma generate` e `prestart` roda `prisma migrate deploy`. Healthcheck: `/health`.
+  - Backend: usa Nixpacks, `postinstall` roda `prisma generate` e `prestart` aplica o schema (`migrate deploy` ou `db push`) e executa o seed automaticamente se o banco estiver vazio.
   - Frontend: `next build` e `next start -p $PORT` (via Procfile).
   - Admin: `next build` e `next start -p $PORT` (via Procfile).
 
@@ -27,20 +27,30 @@ base/
 1) No Railway, crie um Postgres e copie o `DATABASE_URL`.
 2) Crie dois serviços a partir deste repositório (o Railway detectará via `railway.json`).
 3) Em cada serviço, confirme o `Root Directory` conforme acima e defina as variáveis de ambiente.
-4) Deploy. Opcional: rode seed no backend via Shell: `npm run seed` (no diretório `base/backend`).
+4) Deploy. O backend executa seed no primeiro start se não houver dados (tenants, templates e products).
 
 ## Desenvolvimento local
 
 - Backend
 ```bash
 cd base/backend
+cp -n .env.example .env
+# preencha DATABASE_URL
 npm install
-npx prisma generate
 npm run dev
 ```
+
 - Frontend
 ```bash
 cd base/templates/frontend-template
 npm install
+npm run dev
+```
+
+- Admin (opcional)
+```bash
+cd base/admin-frontend
+npm install
+# Se não configurar o backend, o admin usa fallbacks com dados de exemplo
 npm run dev
 ```
