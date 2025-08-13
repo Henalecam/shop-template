@@ -1,58 +1,59 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
+import { api } from "../../lib/api";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
 const FRONTEND_BASE = process.env.NEXT_PUBLIC_FRONTEND_BASE_URL || "";
 
 type Template = { id: string; name: string; slug: string; preview_url: string };
 
-async function fetchTemplates() {
-  const res = await axios.get(`${API_URL}/admin/templates`);
-  return res.data as Template[];
-}
-
 export default function TemplatesPage() {
-  const { data, isLoading, error } = useQuery({ queryKey: ["templates"], queryFn: fetchTemplates });
-  const templates = useMemo(() => data ?? [], [data]);
+  const { data, isLoading, error } = useQuery({ queryKey: ["templates"], queryFn: api.listTemplates });
+  const templates = useMemo<Template[]>(() => data ?? [], [data]);
   const [tenantIdPreview, setTenantIdPreview] = useState("");
 
   return (
-    <div>
+    <div className="vstack">
       <h1>Templates</h1>
-      <div style={{ marginBottom: 12 }}>
-        <label>
-          Tenant ID para preview:
-          <input
-            value={tenantIdPreview}
-            onChange={(e) => setTenantIdPreview(e.target.value)}
-            placeholder="cole o tenantId aqui"
-            style={{ marginLeft: 8, padding: 4, border: "1px solid #ccc" }}
-          />
-        </label>
+
+      <div className="card section vstack">
+        <div className="grid two">
+          <div>
+            <label>Tenant ID para preview</label>
+            <input className="input" placeholder="cole o tenantId" value={tenantIdPreview} onChange={(e) => setTenantIdPreview(e.target.value)} />
+          </div>
+          <div className="vstack">
+            <label>Ajuda</label>
+            <div style={{ color: "var(--muted)", fontSize: 13 }}>Os templates são e-commerces de nichos diferentes (Skate, Sneakers, Streetwear, Minimal). O preview usa os produtos do tenant informado.</div>
+          </div>
+        </div>
       </div>
 
-      {isLoading && <p>Carregando...</p>}
-      {error && <p>Erro ao carregar</p>}
-
-      <ul>
+      <div className="cards">
+        {isLoading && <div className="card section">Carregando...</div>}
+        {error && <div className="card section" style={{ color: "#fca5a5" }}>Erro ao carregar</div>}
         {templates.map((t) => {
           let href = t.preview_url;
           if (FRONTEND_BASE && tenantIdPreview) href = `${FRONTEND_BASE}/templates/${t.slug}?tenantId=${tenantIdPreview}`;
           else if (tenantIdPreview) href = t.preview_url.replace("{tenantId}", tenantIdPreview);
           return (
-            <li key={t.id} style={{ marginBottom: 8 }}>
-              <strong>{t.name}</strong> — slug: {t.slug} — {" "}
-              <Link href={href} target="_blank">
-                abrir preview
-              </Link>
-            </li>
+            <div key={t.id} className="card section vstack">
+              <div className="hstack" style={{ justifyContent: "space-between" }}>
+                <div>
+                  <div style={{ fontWeight: 600 }}>{t.name}</div>
+                  <div className="badge gray">slug: {t.slug}</div>
+                </div>
+                <Link href={href} target="_blank" className="btn primary">Abrir preview</Link>
+              </div>
+              <div style={{ color: "var(--muted)", fontSize: 13 }}>
+                E-commerce pronto para nicho "{t.slug}" usando todos os produtos do tenant informado.
+              </div>
+            </div>
           );
         })}
-      </ul>
+      </div>
     </div>
   );
 }
