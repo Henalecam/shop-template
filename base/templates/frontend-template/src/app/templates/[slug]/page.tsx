@@ -19,13 +19,42 @@ type Product = {
   image_url?: string | null;
 };
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL as string;
+const BACKEND_URL = (process.env.NEXT_PUBLIC_BACKEND_URL as string) || "/api";
 
 const STYLES: Record<string, { headerBg?: string; accent?: string; font?: string; card?: string }> = {
   minimal: { headerBg: "#ffffff", accent: "#111827", font: "sans-serif", card: "border rounded" },
   skate: { headerBg: "#0ea5e9", accent: "#111827", font: "Impact, sans-serif", card: "border-[3px] border-black" },
   sneakers: { headerBg: "#111827", accent: "#22d3ee", font: "Helvetica, Arial, sans-serif", card: "shadow-lg" },
   streetwear: { headerBg: "#1f2937", accent: "#f59e0b", font: "Arial Black, Arial, sans-serif", card: "border-2 border-gray-800" },
+  electronics: { headerBg: "#0f172a", accent: "#38bdf8", font: "Inter, system-ui, sans-serif", card: "shadow border border-slate-800" },
+};
+
+const FALLBACK_PRODUCTS: Record<string, Product[]> = {
+  minimal: [
+    { id: "p1", name: "Camiseta Básica", description: "100% algodão", price: "49.90" },
+    { id: "p2", name: "Tênis Conforto", description: "Dia a dia", price: "199.90" },
+    { id: "p3", name: "Mochila Urbana", description: "Resistente e leve", price: "129.90" },
+  ],
+  skate: [
+    { id: "p1", name: "Shape Maple 8.0", description: "7 camadas", price: "349.90" },
+    { id: "p2", name: "Roda 52mm", description: "Dureza 99A", price: "129.90" },
+    { id: "p3", name: "Truck Low 139mm", description: "Leve", price: "279.90" },
+  ],
+  sneakers: [
+    { id: "p1", name: "Tênis Runner X", description: "Amortecimento", price: "399.90" },
+    { id: "p2", name: "Tênis Street Pro", description: "Vulcanizado", price: "299.90" },
+    { id: "p3", name: "Meia Performance", description: "Suporte no arco", price: "39.90" },
+  ],
+  streetwear: [
+    { id: "p1", name: "Camiseta Oversized", description: "Malha 230gsm", price: "119.90" },
+    { id: "p2", name: "Calça Cargo", description: "Vários bolsos", price: "199.90" },
+    { id: "p3", name: "Boné Trucker", description: "Ajustável", price: "79.90" },
+  ],
+  electronics: [
+    { id: "p1", name: "Smartphone ZX10", description: "128GB, Câmera 50MP", price: "2599.90" },
+    { id: "p2", name: "Fone Bluetooth ANC", description: "Cancelamento de ruído", price: "699.90" },
+    { id: "p3", name: "Notebook Slim 14", description: "i5, 16GB, SSD 512GB", price: "4599.90" },
+  ],
 };
 
 export default function TemplatePreviewPage() {
@@ -57,22 +86,23 @@ export default function TemplatePreviewPage() {
           fetch(`${BACKEND_URL}/tenant`, { headers }),
           fetch(`${BACKEND_URL}/products`, { headers }),
         ]);
-        if (!tenantRes.ok) throw new Error("Falha ao carregar tenant");
-        if (!productsRes.ok) throw new Error("Falha ao carregar produtos");
+        if (!tenantRes.ok || !productsRes.ok) throw new Error("fallback");
         const tenantJson = await tenantRes.json();
         const productsJson = await productsRes.json();
         setTenant(tenantJson.tenant);
         setDeliveryMessage(tenantJson.delivery_message || "");
         setProducts(productsJson.products || []);
       } catch (e: unknown) {
-        const message = e instanceof Error ? e.message : "Erro ao carregar";
-        setError(message);
+        // Fallback estático para visualização sem backend
+        setTenant({ id: `tenant-${slug}`, name: slug, primary_color: "#111827", secondary_color: "#6366f1" });
+        setProducts(FALLBACK_PRODUCTS[slug] || FALLBACK_PRODUCTS.minimal);
+        setError("");
       } finally {
         setLoading(false);
       }
     }
     bootstrap();
-  }, [headers]);
+  }, [headers, slug]);
 
   const style = STYLES[slug] || STYLES.minimal;
 

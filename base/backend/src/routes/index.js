@@ -13,11 +13,21 @@ const mpPayment = mpClient ? new Payment(mpClient) : null;
 
 const router = Router();
 
-// Public list of templates (optional)
+// Public list of templates with one sample tenant and pre-filled preview URL
 router.get("/templates", async (req, res, next) => {
   try {
-    const templates = await prisma.template.findMany({ orderBy: { created_at: "desc" } });
-    res.json({ templates });
+    const templates = await prisma.template.findMany({
+      orderBy: { created_at: "desc" },
+      include: { tenants: { select: { id: true, name: true }, take: 1 } },
+    });
+    const enriched = templates.map((t) => {
+      const sampleTenant = t.tenants?.[0] || null;
+      const preview_url_filled = sampleTenant
+        ? (t.preview_url || "").replace("{tenantId}", sampleTenant.id)
+        : t.preview_url;
+      return { ...t, preview_url_filled };
+    });
+    res.json({ templates: enriched });
   } catch (err) {
     next(err);
   }

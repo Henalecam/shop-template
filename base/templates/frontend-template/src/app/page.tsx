@@ -19,8 +19,32 @@ type Product = {
   image_url?: string | null;
 };
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL as string;
+const BACKEND_URL = (process.env.NEXT_PUBLIC_BACKEND_URL as string) || "/api";
 const TENANT_ID = process.env.NEXT_PUBLIC_TENANT_ID as string | undefined;
+
+const FALLBACK_PRODUCTS: Product[] = [
+  {
+    id: "p1",
+    name: "Camiseta Básica",
+    description: "Camiseta 100% algodão",
+    price: "49.90",
+    image_url: "https://images.unsplash.com/photo-1520975922284-9d26d111fadd?q=80&w=1200&auto=format&fit=crop",
+  },
+  {
+    id: "p2",
+    name: "Tênis Conforto",
+    description: "Ideal para o dia a dia",
+    price: "199.90",
+    image_url: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1200&auto=format&fit=crop",
+  },
+  {
+    id: "p3",
+    name: "Mochila Urbana",
+    description: "Resistente e leve",
+    price: "129.90",
+    image_url: "https://images.unsplash.com/photo-1547949003-9792a18a2601?q=80&w=1200&auto=format&fit=crop",
+  },
+];
 
 export default function Home() {
   const [tenant, setTenant] = useState<Tenant | null>(null);
@@ -51,16 +75,17 @@ export default function Home() {
           fetch(`${BACKEND_URL}/tenant`, { headers }),
           fetch(`${BACKEND_URL}/products`, { headers }),
         ]);
-        if (!tenantRes.ok) throw new Error("Falha ao carregar tenant");
-        if (!productsRes.ok) throw new Error("Falha ao carregar produtos");
+        if (!tenantRes.ok || !productsRes.ok) throw new Error("fallback");
         const tenantJson = await tenantRes.json();
         const productsJson = await productsRes.json();
         setTenant(tenantJson.tenant);
         setDeliveryMessage(tenantJson.delivery_message || "");
         setProducts(productsJson.products || []);
       } catch (e: unknown) {
-        const message = e instanceof Error ? e.message : "Erro ao carregar";
-        setError(message);
+        // Fallback estático para visualização sem backend
+        setTenant({ id: "tenant-minimal", name: "minimal", primary_color: "#111827", secondary_color: "#6366f1" });
+        setProducts(FALLBACK_PRODUCTS);
+        setError("");
       } finally {
         setLoading(false);
       }
