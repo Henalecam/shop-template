@@ -16,6 +16,8 @@ model Tenant {
   pix_key        String?
   created_at     DateTime  @default(now())
   products       Product[]
+  template_id    String?
+  template       Template? @relation(fields: [template_id], references: [id])
 }
 
 model Product {
@@ -29,4 +31,13 @@ model Product {
   created_at  DateTime @default(now())
 
   @@unique([name, tenant_id], name: "name_tenant_id")
+}
+
+model Template {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  preview_url String
+  created_at  DateTime @default(now())
+  tenants     Tenant[]
 }

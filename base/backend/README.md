@@ -21,7 +21,7 @@ Empurre o schema (requer `DATABASE_URL` válido):
 ```bash
 npx prisma db push
 ```
-Seed opcional de exemplo (cria tenant `loja1` + produtos):
+Seed opcional de exemplo (cria tenants + produtos e templates iniciais):
 ```bash
 npm run seed
 ```
@@ -40,7 +40,15 @@ npm run dev
 Base: `/api`
 - `GET /tenant` → dados do tenant + `delivery_message`
 - `GET /products` → lista de produtos do tenant + `delivery_message`
+- `GET /templates` → lista pública de templates cadastrados
 - `GET /payment/pix/:productId` → payload Pix + QR Code (data URL)
+
+Admin: `/api/admin`
+- `GET /tenants` | `POST /tenants` | `PUT /tenants/:id` | `DELETE /tenants/:id`
+- `GET /tenants/:tenantId/products` | `POST /tenants/:tenantId/products` | `PUT /tenants/:tenantId/products/:id` | `DELETE /tenants/:tenantId/products/:id`
+- `GET /templates` | `POST /templates` | `PUT /templates/:id` | `DELETE /templates/:id`
+
+Observação: Produtos são sempre escopados por `tenant_id`.
 
 Exemplo curl:
 ```bash

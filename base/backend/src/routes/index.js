@@ -13,6 +13,16 @@ const mpPayment = mpClient ? new Payment(mpClient) : null;
 
 const router = Router();
 
+// Public list of templates (optional)
+router.get("/templates", async (req, res, next) => {
+  try {
+    const templates = await prisma.template.findMany({ orderBy: { created_at: "desc" } });
+    res.json({ templates });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.get("/tenant", tenantResolver, geoMessage, async (req, res, next) => {
   try {
     const tenant = res.locals.tenant;
