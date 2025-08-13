@@ -5,6 +5,8 @@ Veja `.env.local.example` e copie para `.env.local`.
 - `NEXT_PUBLIC_BACKEND_URL` → ex.: `https://<seu-backend>.railway.app/api`
 - `NEXT_PUBLIC_TENANT_ID` → `tenants.id` fixo para este front (ou deixe vazio e use subdomínio no backend)
 
+Dica: Também é possível abrir o front em modo preview adicionando `?tenantId=<id>` na URL. Isso define o cabeçalho `x-tenant-id` no client.
+
 ## Rodar localmente
 ```bash
 npm install
@@ -17,7 +19,7 @@ O front busca:
 - `GET {BACKEND_URL}/products` → lista produtos
 - `GET {BACKEND_URL}/payment/pix/:productId` → abre modal com QR Code Pix
 
-Todos os requests enviam `x-tenant-id` se `NEXT_PUBLIC_TENANT_ID` estiver definido.
+Todos os requests enviam `x-tenant-id` se `NEXT_PUBLIC_TENANT_ID` estiver definido ou se `?tenantId=` estiver presente na URL.
 
 ## Deploy (Vercel)
 1. Crie um novo projeto na Vercel apontando para `frontend-template`.

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 
+// Types
 type Tenant = {
   id: string;
   name: string;
@@ -32,7 +33,13 @@ export default function Home() {
 
   const headers: HeadersInit = useMemo(() => {
     const h: Record<string, string> = {};
-    if (TENANT_ID) h["x-tenant-id"] = TENANT_ID;
+    let tenantFromUrl: string | null = null;
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      tenantFromUrl = params.get("tenantId");
+    }
+    const id = tenantFromUrl || TENANT_ID;
+    if (id) h["x-tenant-id"] = id;
     return h;
   }, []);
 
