@@ -21,10 +21,12 @@ Empurre o schema (requer `DATABASE_URL` válido):
 ```bash
 npx prisma db push
 ```
-Seed opcional de exemplo (cria tenants + produtos e templates iniciais):
+Seed de exemplo (cria tenants + produtos e templates iniciais):
 ```bash
 npm run seed
 ```
+
+Observação: ao iniciar o servidor (`npm start`), se o banco estiver vazio, o seed será executado automaticamente (verificação de contagem de `tenants`, `templates` e `products`).
 
 ## Executar localmente
 ```bash
@@ -61,7 +63,8 @@ curl -H "x-tenant-id: <TENANT_ID>" http://localhost:4000/api/payment/pix/<PRODUC
 1. Crie um Postgres no Railway e copie o `DATABASE_URL`.
 2. Crie um serviço de Node.js e conecte este diretório.
 3. Configure envs: `DATABASE_URL`, `PRIMARY_DOMAIN` (opcional), `PORT` (4000).
-4. No Railway shell/CI: `npx prisma generate && npx prisma db push && npm run seed` (opcional).
+4. No Railway shell/CI: `npx prisma generate && npx prisma db push`.
+   - O seed rodará automaticamente no primeiro start se não houver dados.
 5. Após deploy, a API ficará em `https://<seu-servico>.railway.app/api`.
 
 ## Observações
