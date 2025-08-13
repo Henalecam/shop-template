@@ -7,6 +7,7 @@ export type Template = {
   createdAt?: string;
   updatedAt?: string;
   previewUrl?: string;
+  slug?: string;
 };
 
 export type Product = {

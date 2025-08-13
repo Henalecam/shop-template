@@ -17,6 +17,7 @@ export async function GET() {
       createdAt: t.created_at ?? null,
       updatedAt: null,
       previewUrl: t.preview_url_filled || t.preview_url || undefined,
+      slug: t.slug || undefined,
     }));
     return Response.json(data);
   } catch {
