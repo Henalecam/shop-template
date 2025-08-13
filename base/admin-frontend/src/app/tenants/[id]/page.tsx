@@ -39,22 +39,30 @@ export default function TenantPage() {
   const previewUrl = `/?tenantId=${tenantId}`;
 
   return (
-    <div>
-      <h1>Tenant: {tenant?.name || tenantId}</h1>
-      {tenant?.template?.name && <p>Template atual: {tenant.template.name}</p>}
-      <p style={{ marginBottom: 12 }}>
-        <Link href={previewUrl} target="_blank">Abrir loja (preview)</Link>
-      </p>
+    <div className="vstack">
+      <div className="hstack" style={{ justifyContent: "space-between" }}>
+        <div className="hstack" style={{ gap: 8 }}>
+          <Link href="/tenants" className="btn ghost">Voltar</Link>
+          <h1>Tenant: {tenant?.name || tenantId}</h1>
+        </div>
+        <div className="hstack" style={{ gap: 8 }}>
+          {tenant?.template?.name && <span className="badge gray">Template: {tenant.template.name}</span>}
+          <Link href={previewUrl} target="_blank" className="btn primary">Abrir loja (preview)</Link>
+        </div>
+      </div>
 
-      {isLoading && <p>Carregando...</p>}
-      {error && <p>Erro ao carregar</p>}
-      <ul>
-        {(products ?? []).map((p) => (
-          <li key={p.id}>
-            {p.name} — R$ {p.price}
-          </li>
-        ))}
-      </ul>
+      <div className="card section">
+        <h2>Produtos</h2>
+        {isLoading && <div>Carregando...</div>}
+        {error && <div style={{ color: "#fca5a5" }}>Erro ao carregar</div>}
+        <ul>
+          {(products ?? []).map((p) => (
+            <li key={p.id} style={{ padding: 6, borderBottom: "1px solid var(--border)" }}>
+              {p.name} — R$ {p.price}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

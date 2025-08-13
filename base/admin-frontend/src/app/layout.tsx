@@ -1,16 +1,32 @@
 import { Providers } from "./providers";
+import "./globals.css";
+import Link from "next/link";
+
+function Nav() {
+  return (
+    <header className="appbar">
+      <div className="container appbar-inner">
+        <Link href="/" className="hstack" style={{ gap: 10, textDecoration: "none" }}>
+          <span style={{ fontWeight: 700 }}>Admin</span>
+          <span className="badge gray">MVP</span>
+        </Link>
+        <nav className="hstack nav" style={{ gap: 6 }}>
+          <Link href="/">Dashboard</Link>
+          <Link href="/tenants">Tenants</Link>
+          <Link href="/products">Produtos</Link>
+          <Link href="/templates">Templates</Link>
+        </nav>
+      </div>
+    </header>
+  );
+}
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
       <body>
-        <header style={{ padding: 12, borderBottom: "1px solid #eee", display: "flex", gap: 12 }}>
-          <strong>Admin</strong>
-          <a href="/" style={{ color: "#555" }}>Tenants</a>
-          <a href="/products" style={{ color: "#555" }}>Produtos</a>
-          <a href="/templates" style={{ color: "#555" }}>Templates</a>
-        </header>
-        <main style={{ padding: 16 }}>
+        <Nav />
+        <main className="container" style={{ paddingTop: 16 }}>
           <Providers>{children}</Providers>
         </main>
       </body>
