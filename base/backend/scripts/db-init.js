@@ -29,28 +29,19 @@ if (hasMigrations) {
   run("npx", ["prisma", "db", "push"]);
 }
 
-// Após aplicar o schema, garanta que haja dados mínimos via seed
+// Sempre execute o seed de forma idempotente (usa upsert no script de seed)
 const prisma = new PrismaClient();
 
-async function seedIfEmpty() {
+async function alwaysSeed() {
   try {
     await prisma.$connect();
-    const [tenants, templates, products] = await Promise.all([
-      prisma.tenant.count(),
-      prisma.template.count(),
-      prisma.product.count(),
-    ]);
-
-    const shouldSeed = tenants === 0 || templates === 0 || products === 0;
-    if (shouldSeed) {
-      run("node", ["--import=dotenv/config", "prisma/seed.mjs"]);
-    }
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.error("Seed check failed:", err);
+    console.error("Database connection failed before seeding:", err);
   } finally {
     await prisma.$disconnect();
   }
+  run("node", ["--import=dotenv/config", "prisma/seed.mjs"]);
 }
 
-await seedIfEmpty();
+await alwaysSeed();

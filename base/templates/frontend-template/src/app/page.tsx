@@ -55,6 +55,11 @@ export default function Home() {
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const [qrOpen, setQrOpen] = useState<boolean>(false);
 
+  const [buyOpen, setBuyOpen] = useState<boolean>(false);
+  const [selected, setSelected] = useState<Product | null>(null);
+  const [cross, setCross] = useState<Product | null>(null);
+  const [includeCross, setIncludeCross] = useState<boolean>(true);
+
   const headers: HeadersInit = useMemo(() => {
     const h: Record<string, string> = {};
     let tenantFromUrl: string | null = null;
@@ -92,6 +97,25 @@ export default function Home() {
     }
     bootstrap();
   }, [headers]);
+
+  function formatBRL(value: number) {
+    return Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+  }
+
+  function openBuy(product: Product) {
+    setSelected(product);
+    const other = (products || []).find((p) => p.id !== product.id) || null;
+    setCross(other);
+    setIncludeCross(!!other);
+    setBuyOpen(true);
+  }
+
+  function closeBuy() {
+    setBuyOpen(false);
+    setSelected(null);
+    setCross(null);
+    setIncludeCross(true);
+  }
 
   async function handlePix(productId: string) {
     try {
@@ -159,23 +183,92 @@ export default function Home() {
                 )}
                 <div className="mt-auto flex items-center justify-between">
                   <div className="text-lg font-bold" style={{ color: primary }}>
-                    {Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(
-                      Number(p.price)
-                    )}
+                    {formatBRL(Number(p.price))}
                   </div>
-                  <button
-                    onClick={() => handlePix(p.id)}
-                    className="px-4 py-2 rounded-md text-white"
-                    style={{ backgroundColor: secondary }}
-                  >
-                    Pagar com Pix
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => openBuy(p)}
+                      className="px-4 py-2 rounded-md text-white"
+                      style={{ backgroundColor: secondary }}
+                    >
+                      Comprar
+                    </button>
+                    <button
+                      onClick={() => handlePix(p.id)}
+                      className="px-4 py-2 rounded-md text-white"
+                      style={{ backgroundColor: primary }}
+                    >
+                      Pix
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           ))}
         </div>
       </main>
+
+      {buyOpen && selected && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4" onClick={closeBuy}>
+          <div className="bg-white rounded-lg p-4 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+            <div className="font-semibold mb-3" style={{ color: primary }}>Finalizar compra</div>
+
+            <div className="mb-4">
+              <div className="text-sm text-gray-600">Produto</div>
+              <div className="flex items-center justify-between">
+                <div className="font-medium">{selected.name}</div>
+                <div>{formatBRL(Number(selected.price))}</div>
+              </div>
+            </div>
+
+            {cross && (
+              <div className="mb-4 border-t pt-3">
+                <div className="text-sm text-gray-600">Oferta combinada</div>
+                <label className="flex items-center justify-between gap-3">
+                  <div>
+                    <input
+                      type="checkbox"
+                      checked={includeCross}
+                      onChange={(e) => setIncludeCross(e.target.checked)}
+                      className="mr-2"
+                    />
+                    <span className="font-medium">{cross.name}</span>
+                    <span className="ml-2 text-xs text-gray-500">(50% OFF)</span>
+                  </div>
+                  <div className="text-green-700 font-semibold">
+                    {formatBRL(Number(cross.price) / 2)}
+                  </div>
+                </label>
+              </div>
+            )}
+
+            <div className="mt-2 flex items-center justify-between border-t pt-3">
+              <div className="text-sm text-gray-600">Total</div>
+              <div className="font-semibold" style={{ color: primary }}>
+                {formatBRL(
+                  Number(selected.price) + (includeCross && cross ? Number(cross.price) / 2 : 0)
+                )}
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <button
+                className="px-3 py-2 rounded-md border"
+                onClick={closeBuy}
+              >
+                Cancelar
+              </button>
+              <button
+                className="px-3 py-2 rounded-md text-white"
+                style={{ backgroundColor: primary }}
+                onClick={closeBuy}
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {qrOpen && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4" onClick={() => setQrOpen(false)}>

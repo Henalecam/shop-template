@@ -27,6 +27,7 @@ const STYLES: Record<string, { headerBg?: string; accent?: string; font?: string
   sneakers: { headerBg: "#111827", accent: "#22d3ee", font: "Helvetica, Arial, sans-serif", card: "shadow-lg" },
   streetwear: { headerBg: "#1f2937", accent: "#f59e0b", font: "Arial Black, Arial, sans-serif", card: "border-2 border-gray-800" },
   electronics: { headerBg: "#0f172a", accent: "#38bdf8", font: "Inter, system-ui, sans-serif", card: "shadow border border-slate-800" },
+  decor: { headerBg: "#f5f3ff", accent: "#8b5cf6", font: "Inter, system-ui, sans-serif", card: "shadow border border-violet-200" },
 };
 
 const FALLBACK_PRODUCTS: Record<string, Product[]> = {
@@ -67,6 +68,11 @@ export default function TemplatePreviewPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
 
+  const [buyOpen, setBuyOpen] = useState<boolean>(false);
+  const [selected, setSelected] = useState<Product | null>(null);
+  const [cross, setCross] = useState<Product | null>(null);
+  const [includeCross, setIncludeCross] = useState<boolean>(true);
+
   const headers: HeadersInit = useMemo(() => {
     const h: Record<string, string> = {};
     let tenantFromUrl: string | null = null;
@@ -106,6 +112,25 @@ export default function TemplatePreviewPage() {
 
   const style = STYLES[slug] || STYLES.minimal;
 
+  function openBuy(product: Product) {
+    setSelected(product);
+    const other = (products || []).find((p) => p.id !== product.id) || null;
+    setCross(other);
+    setIncludeCross(!!other);
+    setBuyOpen(true);
+  }
+
+  function closeBuy() {
+    setBuyOpen(false);
+    setSelected(null);
+    setCross(null);
+    setIncludeCross(true);
+  }
+
+  function formatBRL(value: number) {
+    return Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+  }
+
   if (loading) return <div className="min-h-screen flex items-center justify-center text-gray-700">Carregando...</div>;
   if (error) return <div className="min-h-screen flex items-center justify-center text-red-600">{error}</div>;
 
@@ -138,14 +163,83 @@ export default function TemplatePreviewPage() {
                 {p.description && <div className="text-sm text-gray-600 line-clamp-3 mb-3">{p.description}</div>}
                 <div className="mt-auto flex items-center justify-between">
                   <div className="text-lg font-bold" style={{ color: style.accent }}>
-                    {Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(p.price))}
+                    {formatBRL(Number(p.price))}
                   </div>
+                  <button
+                    onClick={() => openBuy(p)}
+                    className="px-3 py-2 rounded-md text-white"
+                    style={{ backgroundColor: style.accent }}
+                  >
+                    Comprar
+                  </button>
                 </div>
               </div>
             </div>
           ))}
         </div>
       </main>
+
+      {buyOpen && selected && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4" onClick={closeBuy}>
+          <div className="bg-white rounded-lg p-4 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+            <div className="font-semibold mb-3" style={{ color: style.accent }}>Finalizar compra</div>
+
+            <div className="mb-4">
+              <div className="text-sm text-gray-600">Produto</div>
+              <div className="flex items-center justify-between">
+                <div className="font-medium">{selected.name}</div>
+                <div>{formatBRL(Number(selected.price))}</div>
+              </div>
+            </div>
+
+            {cross && (
+              <div className="mb-4 border-t pt-3">
+                <div className="text-sm text-gray-600">Oferta combinada</div>
+                <label className="flex items-center justify-between gap-3">
+                  <div>
+                    <input
+                      type="checkbox"
+                      checked={includeCross}
+                      onChange={(e) => setIncludeCross(e.target.checked)}
+                      className="mr-2"
+                    />
+                    <span className="font-medium">{cross.name}</span>
+                    <span className="ml-2 text-xs text-gray-500">(50% OFF)</span>
+                  </div>
+                  <div className="text-green-700 font-semibold">
+                    {formatBRL(Number(cross.price) / 2)}
+                  </div>
+                </label>
+              </div>
+            )}
+
+            <div className="mt-2 flex items-center justify-between border-t pt-3">
+              <div className="text-sm text-gray-600">Total</div>
+              <div className="font-semibold" style={{ color: style.accent }}>
+                {formatBRL(
+                  Number(selected.price) + (includeCross && cross ? Number(cross.price) / 2 : 0)
+                )}
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <button
+                className="px-3 py-2 rounded-md border"
+                onClick={closeBuy}
+              >
+                Cancelar
+              </button>
+              <button
+                className="px-3 py-2 rounded-md text-white"
+                style={{ backgroundColor: style.accent }}
+                onClick={closeBuy}
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <footer className="border-t">
         <div className="max-w-5xl mx-auto px-4 py-6 text-sm text-gray-500">© {new Date().getFullYear()} {tenant?.name || "Loja"}</div>

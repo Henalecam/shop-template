@@ -18,6 +18,7 @@ const FALLBACK_TEMPLATES: Template[] = [
   { id: "t-sneakers", name: "Sneakers Store", slug: "sneakers", preview_url: "/templates/sneakers" },
   { id: "t-streetwear", name: "Street Wear", slug: "streetwear", preview_url: "/templates/streetwear" },
   { id: "t-electronics", name: "Electronics", slug: "electronics", preview_url: "/templates/electronics" },
+  { id: "t-decor", name: "Home & Decor", slug: "decor", preview_url: "/templates/decor" },
 ];
 
 export default function TemplatesIndex() {

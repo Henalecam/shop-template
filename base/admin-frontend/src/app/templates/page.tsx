@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { api } from "../../lib/api";
@@ -9,10 +9,19 @@ const FRONTEND_BASE = process.env.NEXT_PUBLIC_FRONTEND_BASE_URL || "";
 
 type Template = { id: string; name: string; slug: string; preview_url: string };
 
+type Tenant = { id: string; name: string };
+
 export default function TemplatesPage() {
-  const { data, isLoading, error } = useQuery({ queryKey: ["templates"], queryFn: api.listTemplates });
-  const templates = useMemo<Template[]>(() => data ?? [], [data]);
+  const { data: templatesData, isLoading, error } = useQuery({ queryKey: ["templates"], queryFn: api.listTemplates });
+  const { data: tenantsData } = useQuery({ queryKey: ["tenants"], queryFn: api.listTenants });
+  const templates = useMemo<Template[]>(() => templatesData ?? [], [templatesData]);
+  const tenants = useMemo<Tenant[]>(() => (tenantsData ?? []).map((t: any) => ({ id: t.id, name: t.name })), [tenantsData]);
+
   const [tenantIdPreview, setTenantIdPreview] = useState("");
+
+  useEffect(() => {
+    if (!tenantIdPreview && tenants.length > 0) setTenantIdPreview(tenants[0].id);
+  }, [tenants, tenantIdPreview]);
 
   return (
     <div className="vstack">
@@ -26,7 +35,7 @@ export default function TemplatesPage() {
           </div>
           <div className="vstack">
             <label>Ajuda</label>
-            <div style={{ color: "var(--muted)", fontSize: 13 }}>Os templates são e-commerces de nichos diferentes (Skate, Sneakers, Streetwear, Minimal). O preview usa os produtos do tenant informado.</div>
+            <div style={{ color: "var(--muted)", fontSize: 13 }}>Os templates são e-commerces de nichos diferentes. O preview usa os produtos do tenant selecionado.</div>
           </div>
         </div>
       </div>
@@ -48,7 +57,7 @@ export default function TemplatesPage() {
                 <Link href={href} target="_blank" className="btn primary">Abrir preview</Link>
               </div>
               <div style={{ color: "var(--muted)", fontSize: 13 }}>
-                E-commerce pronto para nicho "{t.slug}" usando todos os produtos do tenant informado.
+                E-commerce pronto para nicho "{t.slug}" usando os produtos do tenant selecionado.
               </div>
             </div>
           );
