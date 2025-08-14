@@ -3,7 +3,10 @@
   "private": true,
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "base/admin-frontend",
+    "base/backend",
+    "base/templates/*"
   ],
   "scripts": {
     "dev": "npm run dev -w apps/admin",
@@ -12,5 +15,6 @@
   },
   "dependencies": {
     "@acme/templates": "^0.1.0"
-  }
+  },
+  "packageManager": "npm@10.9.0"
 }
