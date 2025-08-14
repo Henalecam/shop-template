@@ -75,21 +75,31 @@ export default function Skate({ tenantId }: { tenantId?: string }) {
 	return (
 		<div className="min-h-[60vh] bg-white text-gray-900" style={{ fontFamily: "Impact, sans-serif" }}>
 			<header className="w-full border-b" style={{ backgroundColor: primary }}>
-				<div className="max-w-5xl mx-auto px-4 py-4 flex items-center gap-4">
+				<div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
 					{tenant?.logo_url ? (
 						<img src={tenant.logo_url} alt={tenant.name} className="h-10 w-auto" />
 					) : (
 						<div className="font-bold text-xl text-black drop-shadow">{tenant?.name || "Loja"}</div>
 					)}
+					<div className="text-sm text-black/80">{new Date().getFullYear()}</div>
 				</div>
 			</header>
 			<main className="max-w-5xl mx-auto px-4 py-8">
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 					{uniqueProducts.map((p) => (
-						<div key={p.id} className="bg-white border-[3px] border-black rounded p-4 flex flex-col gap-1">
-							<div className="font-semibold text-gray-900">{p.name}</div>
-							<div className="text-lg font-bold" style={{ color: secondary }}>
-								{formatBRL(Number(p.price))}
+						<div key={p.id} className="bg-white border-[3px] border-black rounded overflow-hidden">
+							<div className="h-40 w-full bg-[repeating-linear-gradient(45deg,#fafafa,#fafafa_10px,#e5e7eb_10px,#e5e7eb_20px)]" />
+							<div className="p-4 flex flex-col gap-2">
+								<div className="font-semibold text-gray-900">{p.name}</div>
+								{p.description && <div className="text-sm text-gray-600 line-clamp-2">{p.description}</div>}
+								<div className="mt-1 flex items-center justify-between">
+									<div className="text-lg font-bold" style={{ color: secondary }}>
+										{formatBRL(Number(p.price))}
+									</div>
+									<button className="px-3 py-2 rounded-md text-white text-sm" style={{ backgroundColor: secondary }} onClick={() => alert("Comprar: " + p.name)}>
+										Comprar
+									</button>
+								</div>
 							</div>
 						</div>
 					))}

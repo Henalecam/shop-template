@@ -72,17 +72,27 @@ export default function Sneakers({ tenantId }: { tenantId?: string }) {
 	return (
 		<div className="min-h-[60vh]" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
 			<header className="w-full border-b" style={{ backgroundColor: '#111827' }}>
-				<div className="max-w-5xl mx-auto px-4 py-4 flex items-center gap-4">
+				<div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
 					<div className="font-bold text-xl text-white">{tenant?.name || 'Loja'}</div>
+					<div className="text-sm text-slate-300">{new Date().getFullYear()}</div>
 				</div>
 			</header>
 			<main className="max-w-5xl mx-auto px-4 py-8">
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 					{uniqueProducts.map((p) => (
-						<div key={p.id} className="bg-white shadow-lg p-4 flex flex-col gap-1">
-							<div className="font-semibold text-gray-900">{p.name}</div>
-							<div className="text-lg font-bold text-cyan-400">
-								{formatBRL(Number(p.price))}
+						<div key={p.id} className="bg-white shadow-lg overflow-hidden">
+							<div className="h-40 w-full bg-gradient-to-br from-cyan-100 to-white" />
+							<div className="p-4 flex flex-col gap-2">
+								<div className="font-semibold text-gray-900">{p.name}</div>
+								{p.description && <div className="text-sm text-gray-600 line-clamp-2">{p.description}</div>}
+								<div className="mt-1 flex items-center justify-between">
+									<div className="text-lg font-bold text-cyan-400">
+										{formatBRL(Number(p.price))}
+									</div>
+									<button className="px-3 py-2 rounded-md bg-cyan-500 text-white text-sm" onClick={() => alert('Comprar: ' + p.name)}>
+										Comprar
+									</button>
+								</div>
 							</div>
 						</div>
 					))}

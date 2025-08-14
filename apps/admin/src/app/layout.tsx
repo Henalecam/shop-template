@@ -2,7 +2,7 @@
 
 import { ReactNode, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider, CssBaseline, createTheme } from '@mui/material';
+import { ThemeProvider, CssBaseline, createTheme, Alert } from '@mui/material';
 import './globals.css';
 import Nav from '@/components/Nav';
 
@@ -25,7 +25,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <ThemeProvider theme={theme}>
             <CssBaseline />
             <Nav />
-            <main className="container-page py-6">{children}</main>
+            <main className="container-page py-6">
+              <div className="mb-4">
+                <Alert severity="warning">Este app foi descontinuado. Use o admin em base/admin-frontend.</Alert>
+              </div>
+              {children}
+            </main>
           </ThemeProvider>
         </QueryClientProvider>
       </body>
