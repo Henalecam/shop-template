@@ -33,7 +33,8 @@
       },
       "envs": {
         "PORT": "3001",
-        "NEXT_PUBLIC_API_URL": "${{ RAILWAY_PRIVATE_DOMAIN ? `https://$RAILWAY_PRIVATE_DOMAIN` : `https://<backend>.railway.app` }}/api"
+        "NEXT_PUBLIC_API_URL": "${{ RAILWAY_PRIVATE_DOMAIN ? `https://$RAILWAY_PRIVATE_DOMAIN` : `https://<backend>.railway.app` }}/api",
+        "NEXT_PUBLIC_IS_ADMIN": "true"
       },
       "startCommand": "npm start"
     }

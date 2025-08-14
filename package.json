@@ -9,9 +9,11 @@
     "base/templates/*"
   ],
   "scripts": {
-    "dev": "npm run dev -w apps/admin",
-    "build": "npm run build -w apps/admin",
-    "start": "npm run start -w apps/admin"
+    "dev": "npm run dev -w base/admin-frontend",
+    "build": "npm run build -w base/admin-frontend",
+    "start": "npm run start -w base/admin-frontend",
+    "dev:frontend": "npm run dev -w base/templates/frontend-template",
+    "dev:backend": "npm run start -w base/backend"
   },
   "dependencies": {
     "@acme/templates": "^0.1.0"

@@ -1,8 +1,11 @@
+"use client";
 import { Providers } from "./providers";
 import "./globals.css";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 function Nav() {
+  const pathname = usePathname();
   return (
     <header className="appbar">
       <div className="container appbar-inner">
@@ -11,10 +14,10 @@ function Nav() {
           <span className="badge gray">MVP</span>
         </Link>
         <nav className="hstack nav" style={{ gap: 6 }}>
-          <Link href="/">Dashboard</Link>
-          <Link href="/tenants">Tenants</Link>
-          <Link href="/products">Produtos</Link>
-          <Link href="/templates">Templates</Link>
+          <Link href="/" className={pathname === "/" ? "active" : undefined}>Dashboard</Link>
+          <Link href="/tenants" className={pathname?.startsWith("/tenants") ? "active" : undefined}>Tenants</Link>
+          <Link href="/products" className={pathname?.startsWith("/products") ? "active" : undefined}>Produtos</Link>
+          <Link href="/templates" className={pathname?.startsWith("/templates") ? "active" : undefined}>Templates</Link>
         </nav>
       </div>
     </header>

@@ -52,15 +52,16 @@ export default function TemplatesIndex() {
       <h1 className="text-2xl font-bold mb-2">Templates</h1>
       <p className="text-sm text-gray-700">Clique para visualizar um preview com dados de exemplo.</p>
       {error && <div className="text-red-600 text-sm mt-2">{error}</div>}
-      <ul className="list-disc ml-6 mt-4 text-sm text-gray-700 space-y-2">
+      <ul className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
         {templates.map((t) => (
           <li key={t.id}>
             <Link
-              className="text-blue-600 hover:underline"
+              className="block rounded-lg border bg-white p-3 hover:shadow"
               href={t.preview_url_filled || t.preview_url || `/templates/${t.slug}`}
               prefetch={false}
             >
-              {t.name}
+              <div className="font-medium text-gray-900">{t.name}</div>
+              <div className="text-xs text-gray-600">/templates/{t.slug}</div>
             </Link>
           </li>
         ))}

@@ -165,36 +165,122 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="w-full border-b bg-white">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center gap-4">
+        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
           {tenant?.logo_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={tenant.logo_url} alt={tenant.name} className="h-10 w-auto" />
           ) : (
             <div className="font-bold text-xl" style={{ color: primary }}>{tenant?.name || "Loja"}</div>
           )}
+          <div className="text-sm text-gray-500">{new Date().getFullYear()}</div>
         </div>
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-8">
         {deliveryMessage && (
-          <div className="mb-6 text-sm text-gray-700">{deliveryMessage}</div>
+          <div className="mb-6 rounded-md border bg-white p-3 text-sm text-gray-700">
+            {deliveryMessage}
+          </div>
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {uniqueProducts.map((p) => (
-            <div key={p.id} className="bg-white rounded-lg border p-4 flex flex-col gap-1">
-              <div className="font-semibold text-gray-900">{p.name}</div>
-              <div className="text-lg font-bold" style={{ color: primary }}>
-                {formatBRL(Number(p.price))}
+            <div key={p.id} className="bg-white rounded-lg border overflow-hidden">
+              {p.image_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={p.image_url} alt={p.name} className="h-40 w-full object-cover" />
+              ) : (
+                <div className="h-40 w-full bg-gray-100" />
+              )}
+              <div className="p-4 flex flex-col gap-2">
+                <div className="font-semibold text-gray-900">{p.name}</div>
+                {p.description && <div className="text-sm text-gray-600 line-clamp-2">{p.description}</div>}
+                <div className="mt-1 flex items-center justify-between">
+                  <div className="text-lg font-bold" style={{ color: primary }}>
+                    {formatBRL(Number(p.price))}
+                  </div>
+                  <button
+                    className="px-3 py-2 rounded-md text-white text-sm"
+                    style={{ backgroundColor: secondary }}
+                    onClick={() => openBuy(p)}
+                  >
+                    Comprar
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
       </main>
 
+      {buyOpen && selected && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4" onClick={closeBuy}>
+          <div className="bg-white rounded-lg p-4 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+            <div className="font-semibold mb-3" style={{ color: primary }}>Finalizar compra</div>
 
+            <div className="mb-4">
+              <div className="text-sm text-gray-600">Produto</div>
+              <div className="flex items-center justify-between">
+                <div className="font-medium">{selected.name}</div>
+                <div>{formatBRL(Number(selected.price))}</div>
+              </div>
+            </div>
 
+            {cross && (
+              <div className="mb-4 border-t pt-3">
+                <div className="text-sm text-gray-600">Oferta combinada</div>
+                <label className="flex items-center justify-between gap-3">
+                  <div>
+                    <input
+                      type="checkbox"
+                      checked={includeCross}
+                      onChange={(e) => setIncludeCross(e.target.checked)}
+                      className="mr-2"
+                    />
+                    <span className="font-medium">{cross.name}</span>
+                    <span className="ml-2 text-xs text-gray-500">(50% OFF)</span>
+                  </div>
+                  <div className="text-green-700 font-semibold">
+                    {formatBRL(Number(cross.price) / 2)}
+                  </div>
+                </label>
+              </div>
+            )}
 
+            <div className="mt-2 flex items-center justify-between border-t pt-3">
+              <div className="text-sm text-gray-600">Total</div>
+              <div className="font-semibold" style={{ color: primary }}>
+                {formatBRL(
+                  Number(selected.price) + (includeCross && cross ? Number(cross.price) / 2 : 0)
+                )}
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <button
+                className="px-3 py-2 rounded-md border"
+                onClick={closeBuy}
+              >
+                Cancelar
+              </button>
+              <button
+                className="px-3 py-2 rounded-md text-white"
+                style={{ backgroundColor: secondary }}
+                onClick={() => handlePix(selected.id)}
+              >
+                Gerar Pix
+              </button>
+            </div>
+
+            {qrOpen && qrDataUrl && (
+              <div className="mt-4">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={qrDataUrl} alt="QR Code Pix" className="mx-auto" />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <footer className="border-t bg-white">
         <div className="max-w-5xl mx-auto px-4 py-6 text-sm text-gray-500">

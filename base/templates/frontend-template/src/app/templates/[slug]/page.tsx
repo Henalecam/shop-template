@@ -56,6 +56,14 @@ const FALLBACK_PRODUCTS: Record<string, Product[]> = {
     { id: "p2", name: "Fone Bluetooth ANC", description: "Cancelamento de ruído", price: "699.90" },
     { id: "p3", name: "Notebook Slim 14", description: "i5, 16GB, SSD 512GB", price: "4599.90" },
   ],
+  decor: [
+    { id: "p1", name: "Tapete Algodão", description: "Trama macia", price: "229.90" },
+    { id: "p2", name: "Porta-velas", description: "Cerâmica", price: "49.90" },
+    { id: "p3", name: "Manta Tricot", description: "Aconchegante", price: "119.90" },
+    { id: "p4", name: "Luminária de Mesa", description: "Luz quente", price: "129.90" },
+    { id: "p5", name: "Quadro Minimalista", description: "60x40cm", price: "159.90" },
+    { id: "p6", name: "Vaso Cerâmico", description: "Esmaltado", price: "89.90" },
+  ],
 };
 
 export default function TemplatePreviewPage() {
@@ -150,13 +158,14 @@ export default function TemplatePreviewPage() {
   return (
     <div className="min-h-screen" style={{ fontFamily: style.font }}>
       <header className="w-full border-b" style={{ backgroundColor: style.headerBg }}>
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center gap-4">
+        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
           {tenant?.logo_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={tenant.logo_url} alt={tenant.name} className="h-10 w-auto" />
           ) : (
             <div className="font-bold text-xl" style={{ color: style.accent }}>{tenant?.name || "Loja"}</div>
           )}
+          <div className="text-sm" style={{ color: style.accent }}>{new Date().getFullYear()}</div>
         </div>
       </header>
 
@@ -164,10 +173,28 @@ export default function TemplatePreviewPage() {
         {deliveryMessage && <div className="mb-6 text-sm text-gray-700">{deliveryMessage}</div>}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {uniqueProducts.map((p) => (
-            <div key={p.id} className={`bg-white ${style.card} p-4 flex flex-col gap-1`}>
-              <div className="font-semibold text-gray-900">{p.name}</div>
-              <div className="text-lg font-bold" style={{ color: style.accent }}>
-                {formatBRL(Number(p.price))}
+            <div key={p.id} className={`bg-white ${style.card} rounded-lg overflow-hidden`}>
+              {p.image_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={p.image_url} alt={p.name} className="h-40 w-full object-cover" />
+              ) : (
+                <div className="h-40 w-full bg-gray-100" />
+              )}
+              <div className="p-4 flex flex-col gap-2">
+                <div className="font-semibold text-gray-900">{p.name}</div>
+                {p.description && <div className="text-sm text-gray-600 line-clamp-2">{p.description}</div>}
+                <div className="mt-1 flex items-center justify-between">
+                  <div className="text-lg font-bold" style={{ color: style.accent }}>
+                    {formatBRL(Number(p.price))}
+                  </div>
+                  <button
+                    className="px-3 py-2 rounded-md text-white text-sm"
+                    style={{ backgroundColor: style.accent }}
+                    onClick={() => openBuy(p)}
+                  >
+                    Comprar
+                  </button>
+                </div>
               </div>
             </div>
           ))}
