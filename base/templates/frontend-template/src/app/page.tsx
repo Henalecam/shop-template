@@ -72,6 +72,19 @@ export default function Home() {
     return h;
   }, []);
 
+  const uniqueProducts = useMemo(() => {
+    const seen = new Set<string>();
+    const list: Product[] = [];
+    for (const p of products) {
+      const key = Number(p.price).toFixed(2);
+      if (!seen.has(key)) {
+        seen.add(key);
+        list.push(p);
+      }
+    }
+    return list;
+  }, [products]);
+
   useEffect(() => {
     async function bootstrap() {
       try {
@@ -168,128 +181,20 @@ export default function Home() {
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((p) => (
-            <div key={p.id} className="bg-white rounded-lg shadow-sm border overflow-hidden flex flex-col">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={p.image_url || "https://via.placeholder.com/600x400?text=Produto"}
-                alt={p.name}
-                className="h-48 w-full object-cover"
-              />
-              <div className="p-4 flex-1 flex flex-col">
-                <div className="font-semibold text-gray-900 mb-1">{p.name}</div>
-                {p.description && (
-                  <div className="text-sm text-gray-600 line-clamp-3 mb-3">{p.description}</div>
-                )}
-                <div className="mt-auto flex items-center justify-between">
-                  <div className="text-lg font-bold" style={{ color: primary }}>
-                    {formatBRL(Number(p.price))}
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => openBuy(p)}
-                      className="px-4 py-2 rounded-md text-white"
-                      style={{ backgroundColor: secondary }}
-                    >
-                      Comprar
-                    </button>
-                    <button
-                      onClick={() => handlePix(p.id)}
-                      className="px-4 py-2 rounded-md text-white"
-                      style={{ backgroundColor: primary }}
-                    >
-                      Pix
-                    </button>
-                  </div>
-                </div>
+          {uniqueProducts.map((p) => (
+            <div key={p.id} className="bg-white rounded-lg border p-4 flex flex-col gap-1">
+              <div className="font-semibold text-gray-900">{p.name}</div>
+              <div className="text-lg font-bold" style={{ color: primary }}>
+                {formatBRL(Number(p.price))}
               </div>
             </div>
           ))}
         </div>
       </main>
 
-      {buyOpen && selected && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4" onClick={closeBuy}>
-          <div className="bg-white rounded-lg p-4 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
-            <div className="font-semibold mb-3" style={{ color: primary }}>Finalizar compra</div>
 
-            <div className="mb-4">
-              <div className="text-sm text-gray-600">Produto</div>
-              <div className="flex items-center justify-between">
-                <div className="font-medium">{selected.name}</div>
-                <div>{formatBRL(Number(selected.price))}</div>
-              </div>
-            </div>
 
-            {cross && (
-              <div className="mb-4 border-t pt-3">
-                <div className="text-sm text-gray-600">Oferta combinada</div>
-                <label className="flex items-center justify-between gap-3">
-                  <div>
-                    <input
-                      type="checkbox"
-                      checked={includeCross}
-                      onChange={(e) => setIncludeCross(e.target.checked)}
-                      className="mr-2"
-                    />
-                    <span className="font-medium">{cross.name}</span>
-                    <span className="ml-2 text-xs text-gray-500">(50% OFF)</span>
-                  </div>
-                  <div className="text-green-700 font-semibold">
-                    {formatBRL(Number(cross.price) / 2)}
-                  </div>
-                </label>
-              </div>
-            )}
 
-            <div className="mt-2 flex items-center justify-between border-t pt-3">
-              <div className="text-sm text-gray-600">Total</div>
-              <div className="font-semibold" style={{ color: primary }}>
-                {formatBRL(
-                  Number(selected.price) + (includeCross && cross ? Number(cross.price) / 2 : 0)
-                )}
-              </div>
-            </div>
-
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <button
-                className="px-3 py-2 rounded-md border"
-                onClick={closeBuy}
-              >
-                Cancelar
-              </button>
-              <button
-                className="px-3 py-2 rounded-md text-white"
-                style={{ backgroundColor: primary }}
-                onClick={closeBuy}
-              >
-                Confirmar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {qrOpen && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4" onClick={() => setQrOpen(false)}>
-          <div className="bg-white rounded-lg p-4 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
-            <div className="font-semibold mb-3">Escaneie o QR Code para pagar</div>
-            {qrDataUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={qrDataUrl} alt="QR Code Pix" className="w-full h-auto" />
-            ) : (
-              <div className="text-gray-600">Gerando QR Code...</div>
-            )}
-            <button
-              onClick={() => setQrOpen(false)}
-              className="mt-4 w-full px-4 py-2 rounded-md text-white"
-              style={{ backgroundColor: primary }}
-            >
-              Fechar
-            </button>
-          </div>
-        </div>
-      )}
 
       <footer className="border-t bg-white">
         <div className="max-w-5xl mx-auto px-4 py-6 text-sm text-gray-500">
