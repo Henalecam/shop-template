@@ -21,7 +21,7 @@ function Nav() {
   );
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: Parameters<typeof Providers>[0]["children"] }) {
   return (
     <html lang="pt-BR">
       <body>
