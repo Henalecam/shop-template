@@ -1,0 +1,16 @@
+{
+  "name": "acme-monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w apps/admin",
+    "build": "npm run build -w apps/admin",
+    "start": "npm run start -w apps/admin"
+  },
+  "dependencies": {
+    "@acme/templates": "^0.1.0"
+  }
+}
