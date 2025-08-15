@@ -33,7 +33,7 @@ export default function HomePage() {
   })
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => productsApi.update(id, data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<Omit<Product, 'id' | 'created_at'>> }) => productsApi.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] })
       setIsModalOpen(false)
@@ -49,11 +49,11 @@ export default function HomePage() {
     },
   })
 
-  const handleCreateProduct = (data: any) => {
+  const handleCreateProduct = (data: Omit<Product, 'id' | 'created_at'>) => {
     createMutation.mutate(data)
   }
 
-  const handleUpdateProduct = (data: any) => {
+  const handleUpdateProduct = (data: Partial<Omit<Product, 'id' | 'created_at'>>) => {
     if (editingProduct) {
       updateMutation.mutate({ id: editingProduct.id, data })
     }
@@ -135,7 +135,7 @@ export default function HomePage() {
             </Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {products.map((product) => (
+              {products.map((product: Product) => (
                 <ProductCard
                   key={product.id}
                   product={product}
