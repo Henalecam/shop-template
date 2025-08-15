@@ -1,71 +1,91 @@
-# shop-template
+# Sistema de Gerenciamento de Produtos
 
-## Estrutura
+Sistema simples para gerenciar produtos de diferentes lojas, com backend em Node.js/Express e frontend em Next.js.
+
+## Estrutura do Projeto
 
 ```
-base/
-  backend/                 # Projeto base (API Express + Prisma)
-  templates/
-    frontend-template/     # Template frontend (Next.js)
-  admin-frontend/          # Admin isolado (Next.js)
+shop-template/
+├── base/
+│   ├── backend/           # API Node.js + Express + Prisma
+│   └── admin-frontend/    # Interface de gestão (Next.js)
+└── .gitignore
 ```
 
-## Deploy no Railway (monorepo)
+## Componentes
 
-- Configure o projeto na raiz (`railway.json` já aponta cada serviço):
-  - Serviço `backend`: `base/backend`
-  - Serviço `frontend`: `base/templates/frontend-template`
-  - Serviço `admin-frontend`: `base/admin-frontend`
-- Variáveis de ambiente:
-  - Backend: `DATABASE_URL` (PostgreSQL), `PRIMARY_DOMAIN` (opcional), `PORT` (4000)
-  - Frontend: `PORT` (3000) e `NEXT_PUBLIC_BACKEND_URL` apontando para o backend
-  - Admin: `PORT` (3001), `NEXT_PUBLIC_API_URL` apontando para o backend e `NEXT_PUBLIC_IS_ADMIN=true`
-- Build/Run:
-  - Backend: usa Nixpacks, `postinstall` roda `prisma generate` e `prestart` aplica o schema (`migrate deploy` ou `db push`) e executa o seed automaticamente se o banco estiver vazio.
-  - Frontend: `next build` e `next start -p $PORT` (via Procfile).
-  - Admin: `next build` e `next start -p $PORT` (via Procfile).
+### Backend (`base/backend/`)
+- **API REST** para CRUD de produtos
+- **Prisma** como ORM
+- **PostgreSQL** como banco de dados
+- **Endpoints**:
+  - `GET /api/admin/products` - Listar produtos
+  - `POST /api/admin/products` - Criar produto
+  - `PUT /api/admin/products/:id` - Atualizar produto
+  - `DELETE /api/admin/products/:id` - Remover produto
 
-### Passos
-1) No Railway, crie um Postgres e copie o `DATABASE_URL`.
-2) Crie os serviços a partir deste repositório (o Railway detectará via `railway.json`).
-3) Em cada serviço, confirme o `Root Directory` conforme acima e defina as variáveis de ambiente.
-4) Deploy. O backend executa seed no primeiro start se não houver dados (tenants, templates e products).
+### Frontend (`base/admin-frontend/`)
+- **Interface de gestão** para produtos
+- **Upload de imagens** via Cloudinary
+- **Filtro por loja**
+- **Validação de formulários** com React Hook Form + Zod
+- **Gerenciamento de estado** com React Query
 
-## Desenvolvimento local
+## Configuração
 
-Scripts na raiz (usando workspaces):
-
-```bash
-# Admin isolado
-npm run dev
-
-# Somente frontend público
-yarn run dev:frontend
-
-# Somente backend
-npm run dev:backend
-```
-
-- Backend
+### Backend
 ```bash
 cd base/backend
-cp -n .env.example .env
-# preencha DATABASE_URL
 npm install
 npm run dev
 ```
 
-- Frontend
-```bash
-cd base/templates/frontend-template
-npm install
-npm run dev
-```
-
-- Admin
+### Frontend
 ```bash
 cd base/admin-frontend
 npm install
-# Se não configurar o backend, o admin usa fallbacks com dados de exemplo
 npm run dev
 ```
+
+## Banco de Dados
+
+### Schema
+```prisma
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  image_url   String?
+  store_name  String
+  created_at  DateTime @default(now())
+
+  @@unique([name, store_name], name: "name_store_name")
+}
+```
+
+## Variáveis de Ambiente
+
+### Frontend (.env.local)
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:4000/api
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=seu_cloud_name
+NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=seu_upload_preset
+```
+
+## Funcionalidades
+
+- ✅ Criar, editar e remover produtos
+- ✅ Upload de imagens via Cloudinary
+- ✅ Filtro por loja
+- ✅ Interface responsiva e moderna
+- ✅ Validação de formulários
+- ✅ Gerenciamento de estado com React Query
+
+## Tecnologias
+
+- **Backend**: Node.js, Express, Prisma, PostgreSQL
+- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
+- **Upload**: Cloudinary
+- **Formulários**: React Hook Form + Zod
+- **Estado**: React Query
