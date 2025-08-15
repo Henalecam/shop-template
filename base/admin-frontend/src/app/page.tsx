@@ -49,13 +49,21 @@ export default function HomePage() {
     },
   })
 
-  const handleCreateProduct = (data: Omit<Product, 'id' | 'created_at'>) => {
-    createMutation.mutate(data)
+  const handleCreateProduct = (data: { name: string; price: string; store_name: string; description?: string; image_url?: string }) => {
+    const productData = {
+      ...data,
+      price: parseFloat(data.price)
+    }
+    createMutation.mutate(productData)
   }
 
-  const handleUpdateProduct = (data: Partial<Omit<Product, 'id' | 'created_at'>>) => {
+  const handleUpdateProduct = (data: { name: string; price: string; store_name: string; description?: string; image_url?: string }) => {
     if (editingProduct) {
-      updateMutation.mutate({ id: editingProduct.id, data })
+      const productData = {
+        ...data,
+        price: parseFloat(data.price)
+      }
+      updateMutation.mutate({ id: editingProduct.id, data: productData })
     }
   }
 
