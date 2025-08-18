@@ -1,8 +1,13 @@
 # Backend - Multi-Tenant API (Express + Prisma + PostgreSQL)
 
+## ⚠️ Important: OpenSSL Compatibility
+
+If you encounter OpenSSL warnings or Prisma schema engine errors, this is a known compatibility issue. See the [Troubleshooting Guide](./TROUBLESHOOTING.md) for solutions.
+
 ## Requisitos
 - Node.js 18+
 - Banco PostgreSQL (Railway indicado)
+- OpenSSL (for Prisma compatibility)
 
 ## Variáveis de ambiente (`.env`)
 Veja `.env.example` e copie para `.env`.
@@ -11,6 +16,20 @@ Veja `.env.example` e copie para `.env`.
 - `PORT` (padrão 4000)
 
 ## Instalação
+
+### Quick Start
+```bash
+# Use the startup script (recommended)
+./start.sh
+
+# Or manually:
+npm install
+npx prisma generate
+npm run db:init
+npm start
+```
+
+### Manual Installation
 ```bash
 npm install
 npx prisma generate
@@ -21,17 +40,37 @@ Empurre o schema (requer `DATABASE_URL` válido):
 ```bash
 npx prisma db push
 ```
-Seed de exemplo (cria tenants + produtos e templates iniciais):
+
+Seed de exemplo (cria produtos de exemplo):
 ```bash
 npm run seed
 ```
 
-Observação: ao iniciar o servidor (`npm start`), se o banco estiver vazio, o seed será executado automaticamente (verificação de contagem de `tenants`, `templates` e `products`).
+**Observação:** ao iniciar o servidor (`npm start`), se o banco estiver vazio, o seed será executado automaticamente.
 
 ## Executar localmente
+
+### Development Mode
 ```bash
 npm run dev
 # API em http://localhost:4000
+```
+
+### Production Mode
+```bash
+npm start
+```
+
+### Without Database Initialization
+```bash
+npm run start:no-db
+```
+
+## Testing Prisma
+
+Test if Prisma is working correctly:
+```bash
+npm run test:prisma
 ```
 
 ## Middleware de Tenant
@@ -40,24 +79,16 @@ npm run dev
 
 ## Endpoints
 Base: `/api`
-- `GET /tenant` → dados do tenant + `delivery_message`
-- `GET /products` → lista de produtos do tenant + `delivery_message`
-- `GET /templates` → lista pública de templates cadastrados
-- `GET /payment/pix/:productId` → payload Pix + QR Code (data URL)
+- `GET /products` → lista de produtos + `delivery_message`
+- `POST /products` → criar produto
+- `PUT /products/:id` → atualizar produto
+- `DELETE /products/:id` → remover produto
 
 Admin: `/api/admin`
-- `GET /tenants` | `POST /tenants` | `PUT /tenants/:id` | `DELETE /tenants/:id`
-- `GET /tenants/:tenantId/products` | `POST /tenants/:tenantId/products` | `PUT /tenants/:tenantId/products/:id` | `DELETE /tenants/:tenantId/products/:id`
-- `GET /templates` | `POST /templates` | `PUT /templates/:id` | `DELETE /templates/:id`
+- `GET /products` | `POST /products` | `PUT /products/:id` | `DELETE /products/:id`
 
-Observação: Produtos são sempre escopados por `tenant_id`.
-
-Exemplo curl:
-```bash
-curl -H "x-tenant-id: <TENANT_ID>" http://localhost:4000/api/tenant
-curl -H "x-tenant-id: <TENANT_ID>" http://localhost:4000/api/products
-curl -H "x-tenant-id: <TENANT_ID>" http://localhost:4000/api/payment/pix/<PRODUCT_ID>
-```
+Health Check: `/health`
+- Returns application status and environment info
 
 ## Deploy (Railway)
 1. Crie um Postgres no Railway e copie o `DATABASE_URL`.
@@ -67,6 +98,29 @@ curl -H "x-tenant-id: <TENANT_ID>" http://localhost:4000/api/payment/pix/<PRODUC
    - O seed rodará automaticamente no primeiro start se não houver dados.
 5. Após deploy, a API ficará em `https://<seu-servico>.railway.app/api`.
 
+## Troubleshooting
+
+### Common Issues
+1. **OpenSSL Compatibility**: See [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)
+2. **Prisma Schema Engine Error**: Try regenerating the client
+3. **Database Connection**: Check your `DATABASE_URL`
+
+### Quick Fixes
+```bash
+# Clear Prisma cache
+rm -rf node_modules/.prisma
+rm -rf node_modules/@prisma
+
+# Regenerate client
+npm install
+npx prisma generate
+
+# Test connection
+npm run test:prisma
+```
+
 ## Observações
 - CORS liberado para `origin: true` (eco da origem).
-- Geo: `geoip-lite` + `request-ip` adiciona `delivery_message: "Chegará em até 14 dias"`.
+- Graceful shutdown handling for production deployments.
+- Comprehensive error handling with Prisma-specific error codes.
+- Health check endpoint for monitoring.

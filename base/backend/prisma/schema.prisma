@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-1.1.x", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -17,4 +18,5 @@ model Product {
   created_at  DateTime @default(now())
 
   @@unique([name, store_name], name: "name_store_name")
+  @@map("products")
 }
