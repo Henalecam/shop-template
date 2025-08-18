@@ -17,6 +17,20 @@ const ProductCard: React.FC<ProductCardProps> = ({
   onDelete,
   isDeleting = false
 }) => {
+  // Função para formatar o preço de forma segura
+  const formatPrice = (price: any): string => {
+    if (typeof price === 'number' && !isNaN(price)) {
+      return price.toFixed(2);
+    }
+    if (typeof price === 'string') {
+      const numPrice = parseFloat(price);
+      if (!isNaN(numPrice)) {
+        return numPrice.toFixed(2);
+      }
+    }
+    return '0.00';
+  };
+
   return (
     <Card className="h-full flex flex-col">
       <CardHeader className="pb-3">
@@ -27,7 +41,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
           <div className="text-right">
             <p className="text-2xl font-bold text-primary">
-              R$ {product.price.toFixed(2)}
+              R$ {formatPrice(product.price)}
             </p>
           </div>
         </div>
