@@ -47,7 +47,7 @@ try {
     run("npx", ["prisma", "migrate", "deploy"]);
   } else {
     console.log("No migrations found, pushing schema...");
-    run("npx", ["prisma", "db", "push"]);
+    run("npx", ["prisma", "db", "push", "--accept-data-loss"]);
   }
   console.log("Database schema updated successfully");
 } catch (error) {
