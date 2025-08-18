@@ -1,22 +1,29 @@
 FROM node:18-alpine
 
+# Install OpenSSL and other dependencies
+RUN apk add --no-cache openssl
+
 WORKDIR /app
 
-# Copiar arquivos de dependências
+# Copy dependency files
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Instalar dependências
+# Install dependencies
 RUN npm ci --only=production
 
-# Gerar cliente Prisma
+# Generate Prisma client
 RUN npx prisma generate
 
-# Copiar código fonte
+# Copy source code
 COPY . .
 
-# Expor porta
+# Expose port
 EXPOSE 4000
 
-# Comando para iniciar
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:4000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" || exit 1
+
+# Command to start
 CMD ["npm", "start"]

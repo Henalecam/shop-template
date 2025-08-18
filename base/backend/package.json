@@ -11,10 +11,13 @@
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
     "prestart": "node scripts/db-init.js",
+    "start:no-db": "node src/index.js",
     "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "prisma:migrate": "prisma migrate deploy",
+    "db:init": "node scripts/db-init.js",
+    "test:prisma": "node test-prisma.js",
     "seed": "node --import=dotenv/config prisma/seed.mjs"
   },
   "dependencies": {
