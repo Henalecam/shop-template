@@ -78,7 +78,7 @@ export default function HomePage() {
     }
   })
 
-  const handleCreateProduct = (data: { name: string; price: string; store_name: string; description?: string; image_url?: string }) => {
+  const handleCreateProduct = (data: { name: string; price: string; store_name: string; description?: string; image_url?: string; key?: string }) => {
     const productData = {
       ...data,
       price: parseFloat(data.price)
@@ -86,7 +86,7 @@ export default function HomePage() {
     createMutation.mutate(productData)
   }
 
-  const handleUpdateProduct = (data: { name: string; price: string; store_name: string; description?: string; image_url?: string }) => {
+  const handleUpdateProduct = (data: { name: string; price: string; store_name: string; description?: string; image_url?: string; key?: string }) => {
     if (editingProduct) {
       const productData = {
         ...data,
