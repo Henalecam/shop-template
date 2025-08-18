@@ -15,6 +15,7 @@ model Product {
   price       Decimal  @db.Decimal(10, 2)
   image_url   String?
   store_name  String
+  key         String?  // Campo para filtrar produtos por chave
   created_at  DateTime @default(now())
 
   @@unique([name, store_name], name: "name_store_name")
