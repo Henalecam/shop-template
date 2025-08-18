@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  # Instância da Loja A
+  backend-loja-a:
+    build: .
+    ports:
+      - "4001:4000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://username:password@db:5432/multi_tenant_db
+      - Products_Key=loja_a
+      - PORT=4000
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  # Instância da Loja B
+  backend-loja-b:
+    build: .
+    ports:
+      - "4002:4000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://username:password@db:5432/multi_tenant_db
+      - Products_Key=loja_b
+      - PORT=4000
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  # Instância da Loja C
+  backend-loja-c:
+    build: .
+    ports:
+      - "4003:4000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://username:password@db:5432/multi_tenant_db
+      - Products_Key=loja_c
+      - PORT=4000
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  # Instância sem filtro (todas as lojas)
+  backend-geral:
+    build: .
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://username:password@db:5432/multi_tenant_db
+      - Products_Key=
+      - PORT=4000
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  # Banco de dados compartilhado
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=multi_tenant_db
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge

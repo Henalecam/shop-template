@@ -18,7 +18,12 @@
     "prisma:migrate": "prisma migrate deploy",
     "db:init": "node scripts/db-init.js",
     "test:prisma": "node test-prisma.js",
-    "seed": "node --import=dotenv/config prisma/seed.mjs"
+    "seed": "node --import=dotenv/config prisma/seed.mjs",
+    "seed:with-keys": "node scripts/seed-with-keys.js",
+    "migrate:add-key": "node scripts/migrate-add-key.js",
+    "test:key-filter": "node scripts/test-key-filter.js",
+    "db:setup-key": "npm run migrate:add-key && npm run test:key-filter",
+    "db:demo": "npm run migrate:add-key && npm run seed:with-keys && npm run test:key-filter"
   },
   "dependencies": {
     "@prisma/client": "^5.16.1",
