@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, Package } from 'lucide-react'
+import { Plus, Package, AlertCircle, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Modal } from '@/components/ui/modal'
@@ -16,10 +16,11 @@ export default function HomePage() {
   const [editingProduct, setEditingProduct] = useState<Product | undefined>()
   const [storeFilter, setStoreFilter] = useState('')
   const [deletingProductId, setDeletingProductId] = useState<string | null>(null)
+  const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   
   const queryClient = useQueryClient()
 
-  const { data: products = [], isLoading } = useQuery({
+  const { data: products = [], isLoading, error } = useQuery({
     queryKey: ['products', storeFilter],
     queryFn: () => productsApi.getAll(storeFilter || undefined),
   })
@@ -29,7 +30,16 @@ export default function HomePage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] })
       setIsModalOpen(false)
+      setNotification({ type: 'success', message: 'Produto criado com sucesso!' })
+      setTimeout(() => setNotification(null), 3000)
     },
+    onError: (error: any) => {
+      setNotification({ 
+        type: 'error', 
+        message: error.response?.data?.error || 'Erro ao criar produto' 
+      })
+      setTimeout(() => setNotification(null), 5000)
+    }
   })
 
   const updateMutation = useMutation({
@@ -38,7 +48,16 @@ export default function HomePage() {
       queryClient.invalidateQueries({ queryKey: ['products'] })
       setIsModalOpen(false)
       setEditingProduct(undefined)
+      setNotification({ type: 'success', message: 'Produto atualizado com sucesso!' })
+      setTimeout(() => setNotification(null), 3000)
     },
+    onError: (error: any) => {
+      setNotification({ 
+        type: 'error', 
+        message: error.response?.data?.error || 'Erro ao atualizar produto' 
+      })
+      setTimeout(() => setNotification(null), 5000)
+    }
   })
 
   const deleteMutation = useMutation({
@@ -46,7 +65,17 @@ export default function HomePage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] })
       setDeletingProductId(null)
+      setNotification({ type: 'success', message: 'Produto removido com sucesso!' })
+      setTimeout(() => setNotification(null), 3000)
     },
+    onError: (error: any) => {
+      setDeletingProductId(null)
+      setNotification({ 
+        type: 'error', 
+        message: error.response?.data?.error || 'Erro ao remover produto' 
+      })
+      setTimeout(() => setNotification(null), 5000)
+    }
   })
 
   const handleCreateProduct = (data: { name: string; price: string; store_name: string; description?: string; image_url?: string }) => {
@@ -96,6 +125,24 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Notification */}
+      {notification && (
+        <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
+          notification.type === 'success' 
+            ? 'bg-green-500 text-white' 
+            : 'bg-red-500 text-white'
+        }`}>
+          <div className="flex items-center space-x-2">
+            {notification.type === 'success' ? (
+              <CheckCircle className="w-5 h-5" />
+            ) : (
+              <AlertCircle className="w-5 h-5" />
+            )}
+            <span>{notification.message}</span>
+          </div>
+        </div>
+      )}
+
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col space-y-6">
           <div className="flex items-center justify-between">
@@ -122,6 +169,19 @@ export default function HomePage() {
               <Package className="w-12 h-12 mx-auto text-muted-foreground mb-4 animate-pulse" />
               <p className="text-muted-foreground">Carregando produtos...</p>
             </div>
+          ) : error ? (
+            <Card>
+              <CardContent className="text-center py-12">
+                <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Erro ao carregar produtos</h3>
+                <p className="text-muted-foreground mb-4">
+                  Ocorreu um erro ao carregar os produtos. Tente novamente.
+                </p>
+                <Button onClick={() => window.location.reload()}>
+                  Tentar Novamente
+                </Button>
+              </CardContent>
+            </Card>
           ) : products.length === 0 ? (
             <Card>
               <CardContent className="text-center py-12">
