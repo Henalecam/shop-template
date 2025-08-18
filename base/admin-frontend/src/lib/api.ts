@@ -11,6 +11,7 @@ export interface Product {
   price: number;
   image_url?: string;
   store_name: string;
+  key?: string;
   created_at: string;
 }
 

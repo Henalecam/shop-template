@@ -38,6 +38,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <div className="space-y-1">
             <h3 className="font-semibold text-lg line-clamp-2">{product.name}</h3>
             <p className="text-sm text-muted-foreground">{product.store_name}</p>
+            {product.key && (
+              <p className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+                Chave: {product.key}
+              </p>
+            )}
           </div>
           <div className="text-right">
             <p className="text-2xl font-bold text-primary">

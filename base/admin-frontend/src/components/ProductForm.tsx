@@ -18,6 +18,7 @@ const productSchema = z.object({
   ),
   store_name: z.string().min(1, 'Nome da loja é obrigatório'),
   image_url: z.string().optional(),
+  key: z.string().optional(),
 })
 
 type ProductFormData = z.infer<typeof productSchema>
@@ -49,6 +50,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       price: product?.price?.toString() || '',
       store_name: product?.store_name || '',
       image_url: product?.image_url || '',
+      key: product?.key || '',
     }
   })
 
@@ -102,6 +104,18 @@ const ProductForm: React.FC<ProductFormProps> = ({
         />
         {errors.store_name && (
           <p className="text-sm text-destructive">{errors.store_name.message}</p>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="key">Chave do Produto</Label>
+        <Input
+          id="key"
+          {...register('key')}
+          placeholder="Digite a chave do produto (opcional)"
+        />
+        {errors.key && (
+          <p className="text-sm text-destructive">{errors.key.message}</p>
         )}
       </div>
 
